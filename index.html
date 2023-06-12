@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mobiz-Advanced-English-Dictionary</title>
+    <meta charset="UTF-8" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Taviraj");
+
+        * {
+            font-family: taviraj;
+            color: white;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            overflow: hidden;
+            background: #1d1d1d;
+        }
+
+        #wordInputBox {
+            display: block;
+            font-size: 150px;
+            font-weight: bold;
+            background: none;
+            padding: 25px 25px 25px 25px;
+            width: 100%;
+            text-transform: capitalize;
+
+            border: none;
+            outline: none;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        #defninitionBox {
+            padding: 0px 25px 25px 25px;
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.4);
+            font-size: 25px;
+        }
+
+        .main {
+            width: 65vw;
+            background: url('https://img.freepik.com/free-photo/black-concrete-textured-background_53876-145151.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100vh;
+            float: left;
+        }
+
+        #synonyms {
+            width: 35vw;
+            height: 100vh;
+            background: #1d1d1ddd;
+            float: right;
+        }
+
+        #coversynonyms {
+            backdrop-filter: blur(10px);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            place-items: center;
+        }
+
+        button {
+            margin-left: 25px;
+            font-size: 25px;
+            height: 50px;
+            width: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <input id="wordInputBox" />
+        <p id="defninitionBox"></p>
+    </div>
+
+    <div id="synonyms">
+        <div id="coversynonyms">
+            <audio controls id="audioBox"></audio>
+            <button onclick="pickRandomWordToInputToMobizAdvancedDictionary()">🎲</button>
+        </div>
+    </div>
+
+    <script>
+        function fetchWord(inputword) {
+            // Replace WORD_TO_LOOKUP with the word you want to define
+            const word = inputword;
+            const wordinput = document.getElementById("wordInputBox");
+            const defninitionBox = document.getElementById("defninitionBox");
+            const audioBox = document.getElementById("audioBox");
+
+            // Make a GET request to the API
+            fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    // Extract the definition from the parsed JSON data
+                    const definition = data[0].meanings[0].definitions[0].definition;
+                    const phonetics = data[0].phonetics[0].text;
+
+                    audioBox.src = data[0].phonetics[0].audio;
+
+                    wordinput.value = word;
+                    defninitionBox.innerHTML = phonetics + "<br>" + definition;
+
+                    document.getElementById('synonyms').style.backgroundImage = `url("https://source.unsplash.com/1600x900/?${word}")`
+
+                    wordinput.focus()
+                })
+                .catch((error) => defninitionBox.innerHTML = `Cannot find the word ${word}, Please try again!`);
+        }
+
+        fetchWord("Advanced");
+
+        function pickRandomWordToInputToMobizAdvancedDictionary() {
+            fetch('https://random-word-api.herokuapp.com/word?lang=en')
+                .then((response) => response.json())
+                .then((data) => {
+                    fetchWord(data[0])
+                    document.getElementById("wordInputBox").value = data[0];
+                })
+        }
+
+        document
+            .getElementById("wordInputBox")
+            .addEventListener("change", function (event) {
+                const wordinput = document.getElementById("wordInputBox");
+                fetchWord(wordinput.value);
+            });
+    </script>
+</body>
+
+</html>
